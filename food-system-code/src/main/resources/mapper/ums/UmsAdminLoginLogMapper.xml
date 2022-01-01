@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.ecut.lrj.modules.ums.mapper.UmsAdminLoginLogMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="cn.ecut.lrj.modules.ums.model.UmsAdminLoginLog">
+        <id column="id" property="id" />
+        <result column="admin_id" property="adminId" />
+        <result column="create_time" property="createTime" />
+        <result column="ip" property="ip" />
+        <result column="address" property="address" />
+        <result column="user_agent" property="userAgent" />
+    </resultMap>
+
+
+    <select id="selectListByUserName" resultType="cn.ecut.lrj.modules.ums.dto.UmsAdminLogDto">
+        SELECT ug.id id,ua.username userName,ug.create_time createTime,ug.ip ip,address,user_agent userAgent
+        FROM ums_admin_login_log  ug
+        LEFT JOIN ums_admin ua  ON ua.id = ug.admin_id
+        <where>
+            <if test="userName != null and userName != '' ">
+                and  ua.username like concat('%',#{userName},'%')
+            </if>
+        </where>
+        ORDER BY ug.create_time DESC
+    </select>
+</mapper>

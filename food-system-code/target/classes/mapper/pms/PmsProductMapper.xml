@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.ecut.lrj.modules.pms.mapper.PmsProductMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="cn.ecut.lrj.modules.pms.model.PmsProduct">
+        <id column="id" property="id" />
+        <result column="brand_id" property="brandId" />
+        <result column="product_category_id" property="productCategoryId" />
+        <result column="feight_template_id" property="feightTemplateId" />
+        <result column="product_attribute_category_id" property="productAttributeCategoryId" />
+        <result column="name" property="name" />
+        <result column="pic" property="pic" />
+        <result column="product_sn" property="productSn" />
+        <result column="delete_status" property="deleteStatus" />
+        <result column="publish_status" property="publishStatus" />
+        <result column="new_status" property="newStatus" />
+        <result column="recommand_status" property="recommandStatus" />
+        <result column="verify_status" property="verifyStatus" />
+        <result column="sort" property="sort" />
+        <result column="sale" property="sale" />
+        <result column="price" property="price" />
+        <result column="promotion_price" property="promotionPrice" />
+        <result column="gift_growth" property="giftGrowth" />
+        <result column="gift_point" property="giftPoint" />
+        <result column="use_point_limit" property="usePointLimit" />
+        <result column="sub_title" property="subTitle" />
+        <result column="description" property="description" />
+        <result column="original_price" property="originalPrice" />
+        <result column="stock" property="stock" />
+        <result column="low_stock" property="lowStock" />
+        <result column="unit" property="unit" />
+        <result column="weight" property="weight" />
+        <result column="preview_status" property="previewStatus" />
+        <result column="service_ids" property="serviceIds" />
+        <result column="keywords" property="keywords" />
+        <result column="note" property="note" />
+        <result column="album_pics" property="albumPics" />
+        <result column="detail_title" property="detailTitle" />
+        <result column="detail_desc" property="detailDesc" />
+        <result column="detail_html" property="detailHtml" />
+        <result column="detail_mobile_html" property="detailMobileHtml" />
+        <result column="promotion_start_time" property="promotionStartTime" />
+        <result column="promotion_end_time" property="promotionEndTime" />
+        <result column="promotion_per_limit" property="promotionPerLimit" />
+        <result column="promotion_type" property="promotionType" />
+        <result column="brand_name" property="brandName" />
+        <result column="product_category_name" property="productCategoryName" />
+    </resultMap>
+
+    <resultMap id="UpdateInfoMap" extends="BaseResultMap"
+               type="cn.ecut.lrj.modules.pms.dto.ProductUpdateInitDto">
+        <result property="cateParentId" column="cateParentId"/>
+        <!--会员价格-->
+        <collection property="memberPriceList" columnPrefix="pmember_"
+                    resultMap="cn.ecut.lrj.modules.pms.mapper.PmsMemberPriceMapper.BaseResultMap"/>
+        <!--满减价格-->
+        <collection property="productFullReductionList" columnPrefix="fullReductioon_"
+                    resultMap="cn.ecut.lrj.modules.pms.mapper.PmsProductFullReductionMapper.BaseResultMap"/>
+        <!--阶梯价格-->
+        <collection property="productLadderList" columnPrefix="ladder_"
+                    resultMap="cn.ecut.lrj.modules.pms.mapper.PmsProductLadderMapper.BaseResultMap"/>
+        <!--spu-->
+        <collection property="productAttributeValueList" columnPrefix="attrVue_"
+                    resultMap="cn.ecut.lrj.modules.pms.mapper.PmsProductAttributeValueMapper.BaseResultMap"/>
+        <!--sku-->
+        <collection property="skuStockList" columnPrefix="ppSku_"
+                    resultMap="cn.ecut.lrj.modules.pms.mapper.PmsSkuStockMapper.BaseResultMap"/>
+
+    </resultMap>
+
+    <!--修改商品时先获取商品信息-->
+    <select id="updateInfo" resultMap="UpdateInfoMap">
+
+        SELECT
+        p.*,
+        pc.parent_id cateParentId,
+        mp.id pmember_id,mp.member_level_id pmember_member_level_id,mp.member_level_name
+        pmember_member_level,mp.member_price pmember_member_price,
+        pfr.id fullReductioon_id,pfr.full_price fullReductioon_full_price,pfr.reduce_price fullReductioon_reduce_price,
+        pl.id ladder_id,pl.count ladder_count,pl.discount ladder_discount,pl.price ladder_price,
+        pav.id attrVue_id,pav.product_attribute_id attrVue_product_attribute_id,pav.value attrVue_value,
+        psku.id ppSku_id,psku.sku_code ppSku_sku_code,psku.price ppSku_price,psku.stock ppSku_stock,psku.low_stock
+        ppSku_low_stock,
+        psku.sp1 ppSku_sp1,psku.sp2 ppSku_sp2,psku.sp3 ppSku_sp3,psku.pic ppSku_pic,psku.sale ppSku_sale,
+        psku.promotion_price ppSku_promotion_price,psku.lock_stock ppSku_lock_stock
+        FROM pms_product p
+        LEFT JOIN pms_product_category pc ON p.product_category_id=pc.id
+        LEFT JOIN pms_member_price mp ON mp.product_id=p.id
+        LEFT JOIN pms_product_full_reduction pfr ON pfr.product_id=p.id
+        LEFT JOIN pms_product_ladder pl ON pl.product_id=p.id
+        LEFT JOIN pms_product_attribute_value pav ON pav.product_id=p.id
+        LEFT JOIN pms_sku_stock psku ON psku.product_id=p.id
+        where p.id=#{id}
+    </select>
+
+</mapper>
